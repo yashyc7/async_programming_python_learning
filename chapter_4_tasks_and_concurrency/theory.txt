@@ -1,0 +1,33 @@
+Now we are moving from the 
+Running async code 
+to : 
+Controlling concurrency like an enginner 
+
+
+🧠 Problem Statement
+
+So far:
+
+await asyncio.gather(...)
+
+👉 Works, but:
+
+You wait for everything
+No fine control
+No independent execution
+
+
+⚙️ Enter create_task()
+task = asyncio.create_task(coroutine())
+
+👉 This:
+Schedules coroutine immediately
+Runs independently
+Returns a Task object
+
+| Feature         | `gather`        | `create_task`        
+| --------------- | --------------- | --------------------
+| Runs multiple   | ✅               | ❌ (manual)        
+| Returns results | ✅               | ❌ (manual await)  
+| Control         | Low             | High                 
+| Use case        | Batch execution | Fine-grained control

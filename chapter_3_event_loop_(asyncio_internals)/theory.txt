@@ -1,0 +1,87 @@
+🧠 Core Idea
+
+The event loop is the brain of async Python.
+
+It continuously:
+
+Picks a task
+Runs it
+Pauses it when it hits await
+Switches to another task
+
+👉 This is called cooperative multitasking
+(tasks voluntarily give up control at await)\
+
+
+async def task1():
+    await asyncio.sleep(2)
+async def task2():
+    await asyncio.sleep(1)
+
+
+exceution flow : 
+
+1. event loop starts 
+2. start task1 
+3. got await hence pauses it and switch to other task
+4. start task2 
+5 got await hence pauses it 
+6. waits for whichever task finishes first 
+7. resumes that task 
+8. continues untill its done 
+
+
+⚙️ Event Loop Responsibilities
+Maintain task queue
+Track waiting I/O
+Resume paused coroutines
+Handle scheduling
+
+🧩 Important Concept: “Await = Yield Control”
+
+When you write:
+
+await asyncio.sleep(2)
+
+You’re saying:
+
+“I’m waiting. Let someone else run.”
+
+
+🔥 Without Event Loop → Nothing Runs
+async def main():
+    print("Hello")
+
+main()  # ❌ does nothing meaningful
+
+👉 You only get a coroutine object.
+
+✅ Correct Entry Point
+import asyncio
+
+async def main():
+    print("Hello")
+
+asyncio.run(main())
+
+👉 This:
+
+Creates event loop
+Runs coroutine
+Closes loop
+
+
+
+✅ Correct Entry Point
+import asyncio
+
+async def main():
+    print("Hello")
+
+asyncio.run(main())
+
+👉 This:
+
+Creates event loop
+Runs coroutine
+Closes loop

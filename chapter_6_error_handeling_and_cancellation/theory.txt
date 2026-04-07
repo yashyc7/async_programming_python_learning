@@ -1,0 +1,55 @@
+🧠 Core Problem
+
+In real systems:
+
+APIs fail
+Requests hang
+Some tasks succeed, others fail
+
+👉 If you don’t handle this properly:
+
+Entire system crashes ❌
+Memory leaks ❌
+Silent failures ❌
+🔥 1. Exception Handling in Async
+❌ Default Behavior (Dangerous)
+results = await asyncio.gather(*tasks)
+
+👉 If one task fails:
+
+Entire gather fails
+All results lost
+✅ Solution 1 — return_exceptions=True
+results = await asyncio.gather(*tasks, return_exceptions=True)
+
+Now:
+
+All tasks run
+Errors returned as values
+
+
+Rule
+
+Never let one failing task kill all others (unless intentional)
+
+⏱️ 2. Timeouts (Critical in Production)
+❌ Problem
+await fetch()
+
+👉 What if API never responds?
+
+→ Your system hangs forever ❌
+
+✅ Solution — asyncio.wait_for
+await asyncio.wait_for(fetch(), timeout=2)
+
+👉 If exceeds:
+
+Raises TimeoutError
+
+
+3. Task Cancellation
+🧠 Why needed?
+User cancels request
+Timeout exceeded
+System shutting down

@@ -1,0 +1,120 @@
+🧠 Why Patterns Matter
+
+So far you did:
+
+Run tasks concurrently ✅
+Handle failures ✅
+
+But real systems need:
+
+Controlled flow of work under load
+
+Without patterns:
+
+Memory explodes ❌
+APIs get rate-limited ❌
+System crashes under traffic ❌
+
+🔥 Pattern 1 — Producer–Consumer
+🧠 Idea
+
+Split system into:
+
+Producer → generates work
+Consumer → processes work
+
+👉 Connected via queue
+
+⚙️ Tool → asyncio.Queue
+
+Think:
+
+Thread-safe, async-safe task pipeline
+
+check the pattern1.py
+
+
+🧠 Why everything interleaves
+
+Because:
+
+Every await = yield control
+Event loop switches tasks
+⚡ Core Rules You Must Remember
+Rule 1
+await something
+
+👉 Means:
+
+“Pause here and let others run”
+
+Rule 2
+create_task()
+
+👉 Means:
+
+“Start this independently”
+
+Rule 3
+await gather(...)
+
+👉 Means:
+
+“Wait for all to complete”
+
+Rule 4
+
+Queue operations:
+
+Operation	Behavior
+put()	waits if full
+get()	waits if empty
+
+
+
+⚡ Pattern 2 — Fan-Out / Fan-In
+🧠 Idea
+Fan-Out → split work into multiple tasks
+Fan-In → collect results
+
+🧪 Example
+tasks = [fetch(i) for i in range(10)]  # fan-out
+results = await asyncio.gather(*tasks)  # fan-in
+
+👉 You already used this pattern in Chapter 5
+
+
+
+🚦 Pattern 3 — Rate Limiting
+🧠 Problem
+
+If you do:
+
+tasks = [fetch(i) for i in range(1000)]
+
+👉 You might:
+
+Get banned ❌
+Crash server ❌
+✅ Solution → Semaphore
+semaphore = asyncio.Semaphore(5)
+
+🧠 Pattern 4 — Backpressure (Advanced)
+
+Already partially seen with queue.
+
+👉 Idea:
+
+Slow down producers when system is overloaded
+
+Example
+queue = asyncio.Queue(maxsize=10)
+
+👉 Producer blocks if full
+
+⚠️ Real System Mapping
+Pattern	Real Use Case
+Producer–Consumer	Job queues, background workers
+Fan-Out/Fan-In	API aggregation
+Rate limiting	External APIs
+Backpressure	High-load systems

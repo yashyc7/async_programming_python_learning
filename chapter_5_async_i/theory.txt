@@ -1,0 +1,33 @@
+🧠 Core Idea
+
+Async shines when dealing with:
+
+I/O-bound operations (network, disk, DB)
+
+Examples:
+
+API calls
+Database queries
+File reads/writes
+External services
+
+
+🧠 Core Idea
+
+Async shines when dealing with:
+
+I/O-bound operations (network, disk, DB)
+
+Examples:
+
+API calls
+Database queries
+File reads/writes
+External services
+
+
+⚡ Async Approach
+import aiohttp
+import asyncio
+
+👉 aiohttp = async HTTP client (non-blocking)
