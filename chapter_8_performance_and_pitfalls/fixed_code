@@ -1,0 +1,31 @@
+import asyncio
+import aiohttp
+
+
+async def fetch_data(session, i):
+    url = f"https://jsonplaceholder.typicode.com/todos/{i}"
+    try:
+        async with session.get(url) as response:
+            return await response.json()
+    except asyncio.TimeoutError:
+        return {"error": "timeout"}
+    except Exception:
+        return {"error": "failed"}
+
+
+async def main():
+    async with aiohttp.ClientSession() as session:
+        
+        # ❌ DO NOT await here
+        tasks = [
+            asyncio.wait_for(fetch_data(session, i), timeout=2)
+            for i in range(1, 6)
+        ]
+
+        # ✅ await here
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+
+        print(results)
+
+
+asyncio.run(main())

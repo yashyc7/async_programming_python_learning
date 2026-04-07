@@ -1,0 +1,159 @@
+🔥 1. When Async is USELESS
+❌ CPU-Bound Work
+def heavy():
+    for _ in range(10**8):
+        pass
+
+Even if you do:
+
+async def main():
+    await heavy()  # ❌ meaningless
+
+👉 No benefit
+
+🧠 Why?
+
+Because of GIL (Global Interpreter Lock):
+
+Only one thread executes Python bytecode at a time
+Async does NOT bypass this
+
+
+✅ Solution
+
+Use:
+
+multiprocessing (true parallelism)
+Worker systems
+
+🔥 2. Blocking Code Inside Async (MOST COMMON BUG)
+❌ Example
+import time
+
+async def bad():
+    time.sleep(5)  # ❌ blocks event loop
+💣 What happens?
+Entire event loop freezes
+All tasks stop
+Concurrency = 0
+✅ Fix
+await asyncio.sleep(5)
+🧠 Rule
+
+Inside async def → ONLY use async-compatible functions
+
+🔥 3. Fake Async (Looks async, isn't)
+❌ Example
+import requests
+
+async def fetch():
+    return requests.get("https://example.com")  # ❌ blocking
+💣 Problem
+requests is blocking
+Async wrapper is useless
+✅ Fix
+
+Use:
+
+aiohttp
+httpx
+
+🔥 4. Too Many Tasks (Memory Explosion)
+❌ Example
+tasks = [fetch(i) for i in range(100000)]
+await asyncio.gather(*tasks)
+💣 Problem
+Huge memory usage
+Too many open connections
+System crash
+✅ Fix → Limit concurrency
+semaphore = asyncio.Semaphore(10)
+🔥 5. No Timeout = Hanging System
+❌ Example
+await fetch()
+
+👉 If server never responds:
+
+Your system hangs forever
+✅ Fix
+await asyncio.wait_for(fetch(), timeout=2)
+🔥 6. Silent Task Failures
+❌ Example
+asyncio.create_task(bad_task())
+
+👉 If it crashes:
+
+You may never see error
+✅ Fix
+task = asyncio.create_task(bad_task())
+await task
+
+OR:
+
+await asyncio.gather(task, return_exceptions=True)
+🔥 7. Wrong Use of await (Hidden Sequential Execution)
+❌ Example
+for i in range(5):
+    await fetch(i)  # ❌ sequential
+✅ Fix
+tasks = [fetch(i) for i in range(5)]
+await asyncio.gather(*tasks)
+🔥 8. Event Loop Blocking via Sync Libraries
+❌ Example
+import sqlite3  # blocking DB
+
+async def db_call():
+    conn = sqlite3.connect(...)
+✅ Fix
+
+Use:
+
+asyncpg
+async drivers
+🔥 9. Debugging Async is Hard
+🧠 Symptoms
+Random delays
+Out-of-order logs
+Missing outputs
+✅ Tips
+1. Add timestamps
+import time
+print(time.strftime("%X"))
+2. Log task identity
+asyncio.current_task()
+3. Use small test cases first
+🔥 10. Overusing Async
+❌ Bad Design
+async def add(a, b):
+    return a + b
+
+👉 Useless async
+
+🧠 Rule
+
+Use async only for I/O, not logic
+
+🧪 Exercise (Critical Thinking)
+Task
+
+You are given this broken async system:
+
+❌ Bad Code
+import asyncio
+import time
+import requests
+
+async def fetch_data(i):
+    time.sleep(1)  # blocking
+    return requests.get(f"https://jsonplaceholder.typicode.com/todos/{i}").json()
+
+async def main():
+    results = []
+    for i in range(5):
+        results.append(await fetch_data(i))  # sequential
+
+    print(results)
+
+asyncio.run(main())
+🎯 Your Job
+
